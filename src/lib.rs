@@ -40,43 +40,43 @@ use std::io::Write;
 use std::io::Read;
 
 #[derive(Debug)]
-pub enum CombinedError {
+pub enum AphidError {
 	IO(io::Error),
 	SerdeJson(serde_json::Error),
 }
 
 
-impl From<io::Error> for CombinedError {
+impl From<io::Error> for AphidError {
     fn from(err: io::Error) -> Self {
-        CombinedError::IO(err)
+        AphidError::IO(err)
     }
 }
 
-impl From<serde_json::Error> for CombinedError {
+impl From<serde_json::Error> for AphidError {
     fn from(err: serde_json::Error) -> Self {
-        CombinedError::SerdeJson(err)
+        AphidError::SerdeJson(err)
     }
 }
 
 
-pub type SerializeResult<T> = Result<T, CombinedError>;
+pub type AphidResult<T> = Result<T, AphidError>;
 
-pub fn serialize_to_json_file<T, P : AsRef<Path>>(ele: &T, path: P) -> SerializeResult<()> where T : serde::Serialize {
+pub fn serialize_to_json_file<T, P : AsRef<Path>>(ele: &T, path: P) -> AphidResult<()> where T : serde::Serialize {
 	let serialized = serde_json::to_string(ele)?;
 	let serialized_bytes = serialized.into_bytes();
 
 	let mut f = File::create(path)?;
 	f.write_all(&serialized_bytes)?;
-	f.sync_all().map_err(CombinedError::IO)?;
+	f.sync_all().map_err(AphidError::IO)?;
 
 	Ok(())
 }
 
-pub fn deserialize_from_json_file<T, P : AsRef<Path>>(path: P) -> SerializeResult<T> where T : serde::Deserialize {
+pub fn deserialize_from_json_file<T, P : AsRef<Path>>(path: P) -> AphidResult<T> where T : serde::Deserialize {
 	let mut f = File::open(path)?;
 	let mut str_buffer = String::new();
 	f.read_to_string(&mut str_buffer)?;
-	serde_json::from_str(&str_buffer).map_err(CombinedError::SerdeJson)
+	serde_json::from_str(&str_buffer).map_err(AphidError::SerdeJson)
 }
 
 pub fn contains<T, F>(opt: Option<T>, f: F) -> bool where F: Fn(&T) -> bool {

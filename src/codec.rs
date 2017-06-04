@@ -26,10 +26,7 @@ pub trait DeserializeCodec<E> where E : DeserializeOwned {
     fn deserialize(bytes: &[u8]) -> Result<E, CodecError>;
 }
 
-pub trait AsymmetricCodec<IE, OE> where OE : Serialize, IE : DeserializeOwned { // for client <-> server use
-    fn serialize_outgoing(oe: &OE, bytes: &mut BytesMut) -> Result<(), CodecError>;
-    fn deserialize_incoming(bytes: &[u8]) -> Result<IE, CodecError>;
-}
+
 
 use std::io::Write;
 
@@ -94,15 +91,6 @@ impl<E> DeserializeCodec<E> for JsonCodec where E : DeserializeOwned {
     }
 }
 
-impl<IE, OE> AsymmetricCodec<IE, OE> for JsonCodec where OE : Serialize, IE : DeserializeOwned {
-    fn serialize_outgoing(oe: &OE, bytes: &mut BytesMut) -> Result<(), CodecError> {
-        serialize_json_bytes(oe, bytes)
-    }
-
-    fn deserialize_incoming(bytes: &[u8]) -> Result<IE, CodecError> {
-        deserialize_json(bytes)
-    }
-}
 
 
 pub struct BincodeCodec;
@@ -151,16 +139,6 @@ impl<E> SerializeCodec<E> for BincodeCodec where E : Serialize {
 
 impl<E> DeserializeCodec<E> for BincodeCodec where E : DeserializeOwned {
     fn deserialize(bytes: &[u8]) -> Result<E, CodecError> {
-        deserialize_bincode(bytes)
-    }
-}
-
-impl<IE, OE> AsymmetricCodec<IE, OE> for BincodeCodec where OE : Serialize, IE : DeserializeOwned {
-    fn serialize_outgoing(oe: &OE, bytes: &mut BytesMut) -> Result<(), CodecError> {
-        serialize_bincode_bytes(oe, bytes)
-    }
-
-    fn deserialize_incoming(bytes: &[u8]) -> Result<IE, CodecError> {
         deserialize_bincode(bytes)
     }
 }

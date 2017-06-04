@@ -15,6 +15,7 @@ use std::io::Read;
 use std::path::Path;
 use std::fs::File;
 
+pub type Seconds = f64;
 
 use codec::{SerializeCodec, DeserializeCodec};
 

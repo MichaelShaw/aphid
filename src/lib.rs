@@ -3,6 +3,7 @@ extern crate fnv;
 extern crate serde;
 extern crate serde_json;
 extern crate bincode;
+extern crate bytes;
 
 pub mod codec;
 
@@ -13,6 +14,7 @@ use std::io::Write;
 use std::io::Read;
 use std::path::Path;
 use std::fs::File;
+
 
 use codec::{SerializeCodec, DeserializeCodec};
 
@@ -36,8 +38,6 @@ pub fn group_by<T, K, F>(items: Vec<T>, f: F) -> HashMap<K, Vec<T>> where F : Fn
 
     map
 }
-
-
 
 #[derive(Debug)]
 pub enum AphidError {

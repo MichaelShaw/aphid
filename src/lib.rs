@@ -19,6 +19,8 @@ pub type Seconds = f64;
 
 pub type Milliseconds = u64;
 
+pub type Nanoseconds = u64;
+
 use codec::{SerializeCodec, DeserializeCodec};
 
 pub type HashMap<K, V> = fnv::FnvHashMap<K, V>;

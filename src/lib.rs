@@ -6,6 +6,7 @@ extern crate bincode;
 extern crate bytes;
 
 pub mod codec;
+pub mod resource;
 
 use std::hash::Hash;
 use std::collections::hash_map::Entry::*;

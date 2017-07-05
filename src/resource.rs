@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use std::env;
 use std::io;
 use std::fs;
+use std::fs::canonicalize;
 
 #[derive(Eq, Debug, Clone, PartialEq)]
 pub struct GamePaths {
@@ -14,6 +15,7 @@ pub struct GamePaths {
 pub enum PathError {
     IO(io::Error),
     NoHomeDir,
+    NoResourcesDir,
 }
 
 impl From<io::Error> for PathError {
@@ -23,10 +25,13 @@ impl From<io::Error> for PathError {
 }
 
 pub fn get_paths(prefix: &str) -> Result<GamePaths, PathError> {
+    let resources = canonicalize("./resources")?;
+    let resources_string = resources.to_str().ok_or(PathError::NoResourcesDir)?.to_string();
+
     if cfg!(all(target_os = "macos")) { 
         if cfg!(debug_assertions) { // debug, just use local
             Ok((GamePaths {
-                resources: "./resources".into(),
+                resources: resources_string,
                 openal: "./native/openal.dylib".into(),
                 profile: PathBuf::from(format!("./{}.profile.json", prefix)), 
             }))
@@ -62,8 +67,10 @@ pub fn get_paths(prefix: &str) -> Result<GamePaths, PathError> {
             }))
         }
     } else  {
+        
+        
         Ok((GamePaths {
-            resources: "./resources".into(),
+            resources: resources_string,
             openal: "./native/OpenAL64.dll".into(),
             profile: PathBuf::from("./{}.profile.json"), // current directory
         }))

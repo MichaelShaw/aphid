@@ -24,12 +24,12 @@ impl From<io::Error> for PathError {
     }
 }
 
-pub fn get_paths(prefix: &str) -> Result<GamePaths, PathError> {
+pub fn get_paths(prefix: &str, package: bool) -> Result<GamePaths, PathError> {
     let resources = canonicalize("./resources")?;
     let resources_string = resources.to_str().ok_or(PathError::NoResourcesDir)?.to_string();
 
     if cfg!(all(target_os = "macos")) { 
-        if cfg!(debug_assertions) { // debug, just use local
+        if !package || cfg!(debug_assertions) { // debug, just use local
             Ok((GamePaths {
                 resources: resources_string,
                 openal: "./native/openal.dylib".into(),
